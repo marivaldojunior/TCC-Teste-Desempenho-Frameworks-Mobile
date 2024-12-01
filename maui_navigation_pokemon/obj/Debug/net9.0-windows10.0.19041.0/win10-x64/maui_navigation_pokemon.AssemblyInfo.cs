@@ -11,14 +11,10 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyMetadataAttribute("Microsoft.Maui.ApplicationModel.AppInfo.PackageName", "com.companyname.maui_navigation_pokemon")]
-[assembly: System.Reflection.AssemblyMetadataAttribute("Microsoft.Maui.ApplicationModel.AppInfo.PublisherName", "User Name")]
-[assembly: System.Reflection.AssemblyMetadataAttribute("Microsoft.Maui.ApplicationModel.AppInfo.Name", "maui_navigation_pokemon")]
-[assembly: System.Reflection.AssemblyMetadataAttribute("Microsoft.Maui.ApplicationModel.AppInfo.Version", "1.0.0.1")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("maui_navigation_pokemon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+65f8e9e79e78a663cb92fd88683c1bfedd31a072")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+00070c7cdc0bea7f4aa115f4d9266df0a49bd116")]
 [assembly: System.Reflection.AssemblyProductAttribute("maui_navigation_pokemon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("maui_navigation_pokemon")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
