@@ -3,70 +3,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 void main() {
-  runApp(const MyApp());
+  runApp(const PokemonListApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PokemonListApp extends StatelessWidget {
+  const PokemonListApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Pokemon ListView',
+      title: 'Lista de Pokémon',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      //home: const MyHomePage(title: 'Pokemon ListView'),
       home: const PokemonListPage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
@@ -79,26 +29,34 @@ class PokemonListPage extends StatefulWidget {
 }
 
 class _PokemonListPageState extends State<PokemonListPage> {
-  List<String> pokemonList = [];
-  bool isLoading = true;
+  late Future<List<Map<String, dynamic>>> _pokemonList;
 
   @override
   void initState() {
     super.initState();
-    fetchPokemon();
+    _pokemonList = fetchPokemon();
   }
 
-  Future<void> fetchPokemon() async {
-    final response = await http
-        .get(Uri.parse('https://pokeapi.co/api/v2/pokemon?limit=809'));
+  Future<List<Map<String, dynamic>>> fetchPokemon() async {
+    const url = 'https://pokeapi.co/api/v2/pokemon?limit=649';
+    final response = await http.get(Uri.parse(url));
+
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        pokemonList = List<String>.from(data['results'].map((p) => p['name']));
-        isLoading = false;
-      });
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>;
+
+      // Adiciona o índice como número do Pokémon
+      return results
+          .asMap()
+          .entries
+          .map((entry) => {
+                'name': entry.value['name'],
+                'number': entry.key +
+                    1, // Índice + 1 para corresponder ao ID do Pokémon
+              })
+          .toList();
     } else {
-      throw Exception('Failed to load Pokémon');
+      throw Exception('Falha ao carregar os Pokémon');
     }
   }
 
@@ -106,25 +64,78 @@ class _PokemonListPageState extends State<PokemonListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pokemon ListView"),
+        title: const Text('Lista de Pokémon'),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _pokemonList,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nenhum Pokémon encontrado'));
+          } else {
+            final pokemonList = snapshot.data!;
+            return ListView.builder(
               itemCount: pokemonList.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue.shade100,
-                    child: Text(pokemonList[index][0].toUpperCase()),
-                  ),
-                  title: Text(
-                    pokemonList[index],
-                    style: const TextStyle(fontSize: 18),
+                final pokemon = pokemonList[index];
+                final number = pokemon['number']
+                    .toString()
+                    .padLeft(3, '0'); // Formata como "001", "002", etc.
+                final name = pokemon['name'];
+                final pngImage = 'assets/images/${number}MS.png';
+                final gifImage = 'assets/images/$number.gif';
+
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        // Primeira coluna: PNG
+                        Expanded(
+                          flex: 1,
+                          child: Image.asset(
+                            pngImage,
+                            height: 50,
+                            width: 50,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        // Segunda coluna: Texto
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            name,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // Terceira coluna: GIF
+                        Expanded(
+                          flex: 1,
+                          child: Image.asset(
+                            gifImage,
+                            height: 50,
+                            width: 50,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
-            ),
+            );
+          }
+        },
+      ),
     );
   }
 }
