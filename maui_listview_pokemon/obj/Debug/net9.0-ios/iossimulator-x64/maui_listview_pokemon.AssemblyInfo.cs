@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("maui_listview_pokemon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+10560e9081e1b70cac55d8347527ff0e766b6f6f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+b9d7153c0d08b24a6a91a62b6cc537359f40d899")]
 [assembly: System.Reflection.AssemblyProductAttribute("maui_listview_pokemon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("maui_listview_pokemon")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
